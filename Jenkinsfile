@@ -4,11 +4,13 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'docker build'
-                def testImage = docker.build("test-image")
-                echo 'docker push'
-                testImage.push()
-                echo 'Building..'
+                script{
+                    echo 'docker build'
+                    def testImage = docker.build("test-image")
+                    echo 'docker push'
+                    testImage.push()
+                    echo 'Building..'
+                }
             }
         }
         stage('Test') {

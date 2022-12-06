@@ -6,6 +6,7 @@ pipeline {
             steps {
                 script{
                     echo 'docker build'
+                    docker.withRegistry('http://192.168.31.31:5000')
                     def testImage = docker.build("test-image")
                     echo 'docker push'
                     testImage.push()

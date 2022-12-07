@@ -4,8 +4,9 @@ pipeline {
         string(name: 'repoUrl', defaultValue: 'git@gitee.com:JornahLee/blog-jl.git', description: 'repo url')
         //repoBranch参数后续替换成git parameter不再依赖手工输入,JENKINS-46451【git parameters目前还不支持pipeline】
         string(name: 'repoBranch', defaultValue: 'refactor_v2', description: 'git branch name')
-        string(name: 'dockerRegistry', defaultValue: 'http://192.168.31.31:5000', description: 'docker registry')
+        string(name: 'dockerRegistry', defaultValue: 'http://132.232.81.70:5000', description: 'docker registry')
         string(name: 'imageName', defaultValue: 'my-image', description: 'image name')
+        string(name: 'dockerRegistryCredentialId', defaultValue: '132.232.81.70-docker-registry', description: 'docker Registry Credential Id')
     }
     tools {
         maven 'my maven'
@@ -28,7 +29,7 @@ pipeline {
             steps {
                 script {
                     echo 'docker build'
-                    docker.withRegistry(params.dockerRegistry) {
+                    docker.withRegistry(params.dockerRegistry,params.dockerRegistryCredentialId) {
                         def image = docker.build(params.imageName)
                         image.push()
                     }

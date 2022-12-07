@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('fetch code') {
             steps {
-                println("this is branch name : ${repoBranch}")
+                println("this is branch name : ${params.repoBranch}")
                 git branch: params.repoBranch, credentialsId: 'jenkins', url: params.repoUrl
             }
         }

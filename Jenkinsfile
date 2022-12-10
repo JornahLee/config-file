@@ -59,30 +59,26 @@ pipeline {
                             remote.allowAnyHosts = true
                             sshCommand remote: remote, command: """
 containerId=`docker ps -a | grep -w ${params.imageName} | awk '{print \$1}'`
-imageId=`docker images | grep -w ${params.imageName}  | awk '{print \$3}'`
-if [ "\$imageId" !=  "" ] ; then
-    if [ "\$containerId" !=  "" ] ; then
-        #停掉容器
-        echo 'stop container....'
-        docker stop `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
-    
-        #删除容器
-        echo 'clean container....'
-        docker rm `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
-    
-        #删除镜像
-        echo 'clean image ....'
-        docker rmi --force ${params.dockerRegistryLanHost}/${params.imageName}
-    else
-         #删除镜像
-        echo 'clean image ....'
-        docker rmi --force ${params.dockerRegistryLanHost}/${params.imageName}
-    fi
+imageNameAndTag=`docker ps | grep -w ${params.imageName}  | awk '{print \\\$2}'`
+if [ "\$containerId" !=  "" ] ; then
+    #停掉容器
+    echo 'stop container....'
+    docker stop `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
+
+    #删除容器
+    echo 'clean container....'
+    docker rm `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
+
+    #删除镜像
+    echo 'clean image ....'
+    docker rmi --force "\$imageNameAndTag"
 fi
 """
 //                        cloud server LAN ip : 172.27.0.6
                             sshCommand remote: remote, command: "docker login -u $dockeruser -p $dockerpwd ${params.dockerRegistryLanHost}"
-                            sshCommand remote: remote, command: "docker run --name myblog -d -p 8089:8089 ${params.dockerRegistryLanHost}/${params.imageName}:${imageTag}"
+                            startCmd = "docker run --name ${params.imageName} -d -p 8089:8089 ${params.dockerRegistryLanHost}/${params.imageName}:${imageTag}"
+                            println "start cmd : ${startCmd}"
+                            sshCommand remote: remote, command: startCmd
                         }
                     }
                 }

@@ -23,7 +23,7 @@ pipeline {
                 println("this is branch name : ${params.repoBranch}")
                 git branch: params.repoBranch, credentialsId: 'jenkins', url: params.repoUrl
                 script {
-                    env.imageTag = sh(script: 'git rev-parse --short HEAD ${GIT_COMMIT}', returnStdout: true).trim()
+                    env.imageTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                 }
             }
         }

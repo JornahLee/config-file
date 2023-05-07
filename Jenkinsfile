@@ -3,7 +3,7 @@ pipeline {
     parameters {
         string(name: 'repoUrl', defaultValue: 'git@gitee.com:JornahLee/blog-jl.git', description: 'repo url')
         //repoBranch参数后续替换成git parameter不再依赖手工输入,JENKINS-46451【git parameters目前还不支持pipeline】
-        string(name: 'repoBranch', defaultValue: 'refactor_v2', description: 'git branch name')
+        string(name: 'repoBranch', defaultValue: 'master', description: 'git branch name')
         string(name: 'dockerRegistry', defaultValue: 'http://132.232.81.70:5000', description: 'docker registry')
         string(name: 'imageName', defaultValue: 'my-image', description: 'image name')
         string(name: 'dockerRegistryCredentialId', defaultValue: 'tx-docker-registry', description: 'docker Registry Credential Id')

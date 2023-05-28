@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'repoUrl', defaultValue: 'git@gitee.com:JornahLee/blog-jl-front.git', description: 'repo url')
+        string(name: 'repoBranch', defaultValue: 'main', description: 'git branch name')
+        string(name: 'deployServerHost', defaultValue: 'az.499801.xyz', description: 'deployServerHost')
+        string(name: 'deployServerCredentialId', defaultValue: 'az-jornah', description: 'deployServerCredentialId')
+    }
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        nodejs "myNodeJs17.0.0"
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+    stages {
+        stage('fetch code') {
+            steps {
+                println("this is branch name : ${params.repoBranch}")
+                git branch: params.repoBranch, credentialsId: 'jenkins', url: params.repoUrl
+                script {
+                    env.imageTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+            }
+        }
+        stage('npm build') {
+            steps {
+                sh 'npm config set registry https://registry.npm.taobao.org'
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        stage('send artifact') {
+            steps {
+                echo 'send artifact'
+                sh 'tar -czvf dist.tgz dist'
+                sh 'scp -o StrictHostKeyChecking=no dist.tgz jornah@az.499801.xyz:/home/jornah/workspace/blog-front/dist.tgz'
+            }
+        }
+        stage('deploy') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: params.deployServerCredentialId, passwordVariable: 'password', usernameVariable: 'uname')]) {
+                        def remote = [:]
+                        remote.name = 'deploy Server'
+                        remote.host = params.deployServerHost
+                        remote.user = uname
+                        remote.password = password
+                        remote.allowAnyHosts = true
+                        startCmd = "cd /home/jornah/workspace/blog-front  && tar -xvzf dist.tgz"
+                        sshCommand remote: remote, command: startCmd
+                    }
+                }
+
+            }
+        }
+
+
+    }
+}

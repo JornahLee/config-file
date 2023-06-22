@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-api-deployment
+spec:
+  selector:
+    matchLabels:
+      app: blog-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: blog-api
+    spec:
+      nodeName: centos-free
+      containers:
+        - name: blog-api
+          image: jornaharc.azurecr.io/my-image:a2250b1
+          ports:
+            - containerPort: 8089
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: db.url
+            - name: DB_USER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: db.username
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: db.password
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: redis.host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: redis.port
+            - name: REDIS_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: redis.password
+            - name: ES_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: blog-jl-config
+                  key: es.url

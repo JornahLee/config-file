@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'repoUrl', defaultValue: 'git@gitee.com:JornahLee/blog-jl-front.git', description: 'repo url')
+        string(name: 'imageName', defaultValue: 'blog-front', description: 'imageName')
+        string(name: 'dockerRegistry', defaultValue: 'https://docker-registry.499801.xyz', description: 'dockerRegistry')
+        string(name: 'repoBranch', defaultValue: 'main', description: 'git branch name')
+    }
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        nodejs "myNodeJs17.0.0"
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+    stages {
+        stage('fetch code') {
+            steps {
+                println("this is branch name : ${params.repoBranch}")
+                git branch: params.repoBranch, credentialsId: 'jenkins', url: params.repoUrl
+                script {
+                    env.imageTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+            }
+        }
+        stage('npm build') {
+            steps {
+                sh 'npm config set registry https://registry.npm.taobao.org'
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        stage('push docker image') {
+            steps {
+                script {
+                    echo 'docker build'
+                    sh 'echo "FROM nginx"> Dockerfile'
+                    sh 'echo "COPY ./dist /usr/share/nginx/html" >> Dockerfile'
+                    sh 'echo "EXPOSE 80">> Dockerfile'
+//                    string dockerCmd = 'CMD ["nginx", "-g", "daemon off;"]'
+//                    sh "echo $dockerCmd >> Dockerfile"
+                    sh 'cat Dockerfile'
+
+                    docker.withRegistry(params.dockerRegistry, params.dockerRegistryCredentialId) {
+                        def image = docker.build(params.imageName)
+                        image.push(imageTag)
+                        image.push()
+                    }
+
+                }
+            }
+        }
+
+
+
+    }
+}

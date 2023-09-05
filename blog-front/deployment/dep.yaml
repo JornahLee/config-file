@@ -18,3 +18,11 @@ spec:
           image: docker-registry.499801.xyz/blog-front:latest
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: "/etc/nginx/conf.d/"
+              readOnly: true
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config

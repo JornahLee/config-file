@@ -1,0 +1,24 @@
+        stage('send artifact') {
+            steps {
+                echo 'send artifact'
+                sh 'tar -czvf dist.tgz dist'
+                sh 'scp -o StrictHostKeyChecking=no dist.tgz jornah@az.499801.xyz:/home/jornah/workspace/blog-front/dist.tgz'
+            }
+        }
+        stage('deploy') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: params.deployServerCredentialId, passwordVariable: 'password', usernameVariable: 'uname')]) {
+                        def remote = [:]
+                        remote.name = 'deploy Server'
+                        remote.host = params.deployServerHost
+                        remote.user = uname
+                        remote.password = password
+                        remote.allowAnyHosts = true
+                        startCmd = "cd /home/jornah/workspace/blog-front  && tar -xvzf dist.tgz"
+                        sshCommand remote: remote, command: startCmd
+                    }
+                }
+
+            }
+        }

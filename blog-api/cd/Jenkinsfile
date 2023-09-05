@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'kubeConfigCredId', defaultValue: 'kube-config-rn', description: 'kube config base64 str')
+        string(name: 'imageVersion', defaultValue: 'latest', description: 'imageVersion')
+        booleanParam(name: 'restartFlag', defaultValue: true, description: 'restartFlag')
+        choice(name: 'kustFilePath', choices: ['blog-api/deployment', 'blog-front/deployment'], description: 'kustomiozation file path')
+    }
+    stages {
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'lwolf/helm-kubectl-docker'
+                }
+            }
+            steps {
+                git 'git@gitee.com:JornahLee/config-file.git'
+                sh 'ls -l'
+                withCredentials([string(credentialsId: params.kubeConfigCredId, variable: 'kubeConfigCred')]) {
+                    sh "mkdir -p ~/.kube"
+                    sh "echo ${kubeConfigCred} | base64 -d > ~/.kube/config"
+                }
+                sh 'ls -l'
+                sh "sed -i \'s/latest/${params.imageVersion}/\' ${params.kustFilePath}/dep.yaml"
+                sh "kubectl kustomize ${params.kustFilePath}"
+                script {
+                    if (params.restartFlag) {
+                        sh "kubectl delete -k ${params.kustFilePath}"
+                    }
+                }
+
+                sh "kubectl apply -k ${params.kustFilePath}"
+            }
+        }
+    }
+}

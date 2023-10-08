@@ -4,6 +4,7 @@ pipeline {
         string(name: 'kubeConfigCredId', defaultValue: 'kube-config-rn', description: 'kube config base64 str')
         string(name: 'imageVersion', defaultValue: 'latest', description: 'imageVersion')
         booleanParam(name: 'restartFlag', defaultValue: true, description: 'restartFlag')
+        choice(name: 'nodeName', choices: ['ecs-2rsvn'], description: 'node name which is deployed to')
         choice(name: 'kustFilePath', choices: ['blog-api/deployment', 'blog-front/deployment'], description: 'kustomiozation file path')
     }
     stages {
@@ -24,6 +25,19 @@ pipeline {
                 sh "sed -i \'s/latest/${params.imageVersion}/\' ${params.kustFilePath}/dep.yaml"
                 sh "kubectl kustomize ${params.kustFilePath}"
                 script {
+                    node_name_input = params.nodeName
+                    replaceHolderRegex = /\$\{node_name}/
+                    removeHolderRegex = /.*nodeName.*/
+                    runRegex = node_name_input == '' ? removeHolderRegex : replaceHolderRegex
+
+                    content = readFile params.kustFilePath
+                    if (node_name_input == '') {
+                        newContent = content.replaceAll(removeHolderRegex, '')
+                    } else {
+                        newContent = content.replaceAll(replaceHolderRegex, node_name_input)
+                    }
+                    writeFile file: params.kustFilePath, text: newContent
+
                     if (params.restartFlag) {
                         sh "kubectl delete -k ${params.kustFilePath}"
                     }

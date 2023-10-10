@@ -4,7 +4,7 @@ metadata:
   name: nginx-config
 data:
   # 类文件键
-  front-nginx.conf: |-
+  front-nginx.conf: |
     server {
       listen       8080;
       server_name  localhost;

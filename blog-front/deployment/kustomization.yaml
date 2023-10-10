@@ -1,5 +1,5 @@
-resources:
-#  - dep.yaml
-#  - svc.yaml
-  - cm.yaml
-
+#resources:
+##  - dep.yaml
+##  - svc.yaml
+#  - cm.yaml
+#

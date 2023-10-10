@@ -12,7 +12,7 @@ spec:
       labels:
         app: blog-front
     spec:
-      nodeName: centos-free
+      nodeName: ${node_name}
       containers:
         - name: blog-api
           image: docker-registry.499801.xyz/blog-front:latest

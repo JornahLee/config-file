@@ -12,7 +12,7 @@ spec:
       labels:
         app: blog-front
     spec:
-      nodeName: ${node_name}
+      nodeName: ecs-2rsvn
       containers:
         - name: blog-api
           image: docker-registry.499801.xyz/blog-front:latest

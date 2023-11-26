@@ -6,4 +6,4 @@ metadata:
 secrets:
   - name: service1-token-mp4qs
 imagePullSecrets:
-  - name: cr_docker_io_secrets
+  - name: cr-docker-io-secrets

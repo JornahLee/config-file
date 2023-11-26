@@ -4,19 +4,14 @@
             string(name: 'repoUrl', defaultValue: 'git@gitee.com:JornahLee/blog-jl.git', description: 'repo url')
             //repoBranch参数后续替换成git parameter不再依赖手工输入,JENKINS-46451【git parameters目前还不支持pipeline】
             string(name: 'repoBranch', defaultValue: 'master', description: 'git branch name')
-            string(name: 'dockerRegistry', defaultValue: 'https://docker-registry.499801.xyz', description: 'docker registry')
-            string(name: 'dockerRegistryPrefix', defaultValue: 'docker-registry.499801.xyz', description: 'docker registry')
+            string(name: 'dockerRegistry', defaultValue: 'https://docker.io', description: 'docker registry')
             string(name: 'imageName', defaultValue: 'blog-api', description: 'image name')
-            string(name: 'dockerRegistryCredentialId', defaultValue: 'ACR-azure', description: 'docker Registry Credential Id')
+            string(name: 'dockerRegistryCredentialId', defaultValue: 'cr_docker_io', description: 'docker Registry Credential Id')
 //            string(name: 'deployServerHost', defaultValue: 'az.499801.xyz', description: 'deployServerHost')
 //            string(name: 'deployServerCredentialId', defaultValue: 'az-jornah', description: 'deployServerCredentialId')
 
         }
 
-        tools {
-//            maven 'my maven'
-            jdk 'jdk8'
-        }
         triggers {
             pollSCM('H/2 * * * *')
         }
@@ -49,43 +44,5 @@
                     }
                 }
             }
-//            stage('start container') {
-//                steps {
-//                    // 需要插件 SSH Pipeline Steps
-//                    script {
-//                        withCredentials([usernamePassword(credentialsId: params.dockerRegistryCredentialId, passwordVariable: 'dockerpwd', usernameVariable: 'dockeruser')]) {
-//                            withCredentials([usernamePassword(credentialsId: params.deployServerCredentialId, passwordVariable: 'password', usernameVariable: 'uname')]) {
-//                                def remote = [:]
-//                                remote.name = 'deploy Server'
-//                                remote.host = params.deployServerHost
-//                                remote.user = uname
-//                                remote.password = password
-//                                remote.allowAnyHosts = true
-//                                sshCommand remote: remote, command: """
-//    containerId=`docker ps -a | grep -w ${params.imageName} | awk '{print \$1}'`
-//    imageNameAndTag=`docker ps | grep -w ${params.imageName}  | awk '{print \\\$2}'`
-//    if [ "\$containerId" !=  "" ] ; then
-//        #停掉容器
-//        echo 'stop container....'
-//        docker stop `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
-//
-//        #删除容器
-//        echo 'clean container....'
-//        docker rm `docker ps -a | grep -w ${params.imageName}  | awk '{print \$1}'`
-//
-//        #删除镜像
-//        echo 'clean image ....'
-//        docker rmi --force "\$imageNameAndTag"
-//    fi
-//    """
-//                                sshCommand remote: remote, command: "docker login -u $dockeruser -p $dockerpwd ${params.dockerRegistry}"
-//                                startCmd = "docker run --name ${params.imageName} -d -p 8089:8089 ${params.dockerRegistryPrefix}/${params.imageName}:${imageTag}"
-//                                println "start cmd : ${startCmd}"
-//                                sshCommand remote: remote, command: startCmd
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
     }

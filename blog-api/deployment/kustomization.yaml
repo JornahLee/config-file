@@ -1,4 +1,5 @@
 resources:
   - dep.yaml
   - svc.yaml
+  - svc-account.yaml
 

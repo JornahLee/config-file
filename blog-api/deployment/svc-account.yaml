@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cr_docker_io_account
+secrets:
+  - name: service1-token-mp4qs
+imagePullSecrets:
+  - name: cr_docker_io_secrets

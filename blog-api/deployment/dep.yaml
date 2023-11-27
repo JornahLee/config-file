@@ -15,7 +15,7 @@ spec:
       nodeName: ${node_name}
       containers:
         - name: blog-api
-          image: docker.io/blog-api:latest
+          image: jornahlee/blog-api:latest
           ports:
             - containerPort: 8089
           env:
@@ -54,4 +54,4 @@ spec:
                 configMapKeyRef:
                   name: blog-jl-config
                   key: es.url
-          serviceAccountName: cr_docker_io_secrets
+#          serviceAccountName: cr_docker_io_secrets

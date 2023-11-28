@@ -12,7 +12,7 @@ spec:
       labels:
         app: blog-front
     spec:
-      nodeName: ecs-2rsvn
+      nodeName: ${node_name}
       containers:
         - name: blog-api
           image: jornahlee/blog-front:latest
